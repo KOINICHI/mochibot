@@ -1,9 +1,4 @@
-import re
-
-def strip_tags(s):
-	return re.sub('<[^<]+?>', '', s)
-def remove_commas(s):
-	return re.sub(',', '', s)
+from utils import strip_tags, remove_commas
 
 class BlackmarketItem:
 
