@@ -60,13 +60,16 @@ class MochiBot(commands.Bot):
 	def log(self, msg):
 		msg = "{0} : {1}".format(datetime.datetime.now(), msg)
 		print (msg)
-		self.log_file.write(msg + '\n')
+		#self.log_file.write(msg + '\n')
 
 	async def blackmarket_notification_task(self):
 		await self.wait_until_ready()
 		self.log("Blackmarket bot started")
 		while not self.is_closed:
-			new_items = self.blackmarket_bot.fetch_new_items()
+			try:
+				new_items = self.blackmarket_bot.fetch_new_items()
+			except:
+				continue
 			if len(new_items) > 0:
 				self.log("new items fetched from blackmarket")
 				server = self.get_server(self.my_server)
@@ -78,7 +81,12 @@ class MochiBot(commands.Bot):
 						await self.send_message(channel, '\n'.join([item.get_market_message() for item in items]))
 						items = []
 				if len(items) > 0:
-					await self.send_message(channel, '\n'.join([item.get_market_message() for item in items]))
+					while True:
+						try:
+							await self.send_message(channel, '\n'.join([item.get_market_message() for item in items]))
+							break
+						except:
+							continue
 
 				players_items = self.blackmarket_bot.get_players_to_notify(new_items)
 				for user_id in players_items:

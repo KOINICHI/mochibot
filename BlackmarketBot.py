@@ -71,7 +71,10 @@ class BlackmarketBot:
 
 	# Fetch the new items from maview API
 	def fetch_new_items(self):
-		res = requests.get(self.url, headers = self.request_headers)
+		try:
+			res = requests.get(self.url, headers = self.request_headers)
+		except:
+			return []
 		res_json = json.loads(res.content.decode('utf-8'))
 		res_json = list(filter(lambda item: int(item['time']) > self.last_updated, res_json))
 
