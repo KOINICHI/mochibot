@@ -1,6 +1,6 @@
 import MochiBot
 
-if __name__ == '__main__':
+def main():
 	token = None
 	with open('keys') as f:
 		token = f.readline().strip()
@@ -9,3 +9,7 @@ if __name__ == '__main__':
 		mochi_bot.start_mochi_bot()
 	else:
 		print ("Invalid Token")
+
+if __name__ == '__main__':
+	while True:
+		main()

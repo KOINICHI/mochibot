@@ -68,32 +68,33 @@ class MochiBot(commands.Bot):
 		while not self.is_closed:
 			try:
 				new_items = self.blackmarket_bot.fetch_new_items()
+
+				if len(new_items) > 0:
+					self.log("new items fetched from blackmarket")
+					server = self.get_server(self.my_server)
+					channel = server.get_channel(self.my_blackmarket)
+					items = []
+					for item in new_items:
+						items.append(item)
+						if len(items) >= 10:
+							await self.send_message(channel, '\n'.join([item.get_market_message() for item in items]))
+							items = []
+					if len(items) > 0:
+						while True:
+							try:
+								await self.send_message(channel, '\n'.join([item.get_market_message() for item in items]))
+								break
+							except:
+								continue
+
+					players_items = self.blackmarket_bot.get_players_to_notify(new_items)
+					for user_id in players_items:
+						items = players_items[user_id]
+						user = await self.get_user_info(user_id)
+						await self.send_message(user, '\n'.join([item.get_market_message() for item in items]))
+				await asyncio.sleep(2)
 			except:
 				continue
-			if len(new_items) > 0:
-				self.log("new items fetched from blackmarket")
-				server = self.get_server(self.my_server)
-				channel = server.get_channel(self.my_blackmarket)
-				items = []
-				for item in new_items:
-					items.append(item)
-					if len(items) >= 10:
-						await self.send_message(channel, '\n'.join([item.get_market_message() for item in items]))
-						items = []
-				if len(items) > 0:
-					while True:
-						try:
-							await self.send_message(channel, '\n'.join([item.get_market_message() for item in items]))
-							break
-						except:
-							continue
-
-				players_items = self.blackmarket_bot.get_players_to_notify(new_items)
-				for user_id in players_items:
-					items = players_items[user_id]
-					user = await self.get_user_info(user_id)
-					await self.send_message(user, '\n'.join([item.get_market_message() for item in items]))
-			await asyncio.sleep(2)
 
 	def start_mochi_bot(self):
 		self.loop.create_task(self.blackmarket_notification_task())
