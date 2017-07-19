@@ -35,6 +35,9 @@ class MochiBot(commands.Bot):
 		async def help(ctx):
 			await self._help(ctx)
 		@self.command(pass_context=True)
+		async def whoami(ctx):
+			await self._whoami(ctx)
+		@self.command(pass_context=True)
 		async def enchant(ctx):
 			await self._enchant(ctx)
 		@self.command(pass_context=True)
@@ -318,3 +321,17 @@ class MochiBot(commands.Bot):
 		reply += "`!!watchlist` to view your watchlist"
 
 		await self.send_message(author, reply)
+
+	async def _whoami(self, ctx):
+		message = ctx.message
+		author = message.author
+
+		reply = ""
+		reply += "Hi, {0}\n".format(author.mention)
+		reply += "You are {0}#{1} (id: {2})\n".format(author.display_name, author.discriminator, author.id)
+		if author.bot:
+			reply += "Huh? you are a bot too? why are you querying this?"
+		reply += "Your avater url is {0}\n".format(author.avatar_url)
+		reply += "You created your account at {0} UTC".format(author.created_at)
+
+		await self.say(reply)
