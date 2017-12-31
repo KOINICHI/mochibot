@@ -1,8 +1,11 @@
 from utils import strip_tags, remove_commas
 
-class BlackmarketItem:
+import MaviewItem
 
+class BlackmarketItem(MaviewItem.MaviewItem):
 	def __init__(self, item):
+		super().__init__(item)
+
 		if item['action'] == "메소에 팔려!":
 			self.type = 0
 		if item['action'] == "메소에 매물로 나와!":
@@ -10,8 +13,6 @@ class BlackmarketItem:
 		if item['action'] == "판매 취소!":
 			self.type = 2
 
-		self.timestamp = item['time']
-		self.time = item['HHmm'][1:-1]
 		self.item_id = item['item_data']
 		self.item_name = strip_tags(item['item_name'])
 		self.price = -1
