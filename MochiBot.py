@@ -4,7 +4,7 @@ from discord.ext import commands
 import random, os, re, itertools, time, datetime, math
 import asyncio
 
-from utils import unquote
+from utils import unquote, group_by
 import CardBot, EnchantBot, BlackmarketBot
 
 class MochiBot(commands.Bot):
@@ -66,12 +66,6 @@ class MochiBot(commands.Bot):
 		#self.log_file.write(msg + '\n')
 
 	async def blackmarket_notification_task(self):
-		def group_by(lst, members=10):
-			ret = []
-			for i in range(math.ceil(len(lst) / members)):
-				ret.append(lst[i * members : (i + 1) * members])
-			return ret
-
 		await self.wait_until_ready()
 		self.log("Blackmarket bot started")
 
