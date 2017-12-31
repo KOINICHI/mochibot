@@ -73,14 +73,14 @@ class BlackmarketBot:
 	def fetch_new_items(self):
 		try:
 			res = requests.get(self.url, headers = self.request_headers)
+			res_json = json.loads(res.content.decode('utf-8'))
+			res_json = list(filter(lambda item: int(item['time']) > self.last_updated, res_json))
 		except:
+			print ("Failed to fetch new items")
 			return []
-		res_json = json.loads(res.content.decode('utf-8'))
-		res_json = list(filter(lambda item: int(item['time']) > self.last_updated, res_json))
 
-		if len(res_json) == 0:
-			return []
-		self.last_updated = int(res_json[-1]['time'])
+		if len(res_json) > 0:
+			self.last_updated = int(res_json[-1]['time'])
 
 		return [BlackmarketItem.BlackmarketItem(item) for item in res_json]
 
