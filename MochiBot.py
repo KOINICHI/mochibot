@@ -1,11 +1,11 @@
 import discord
 from discord.ext import commands
 
-import random, os, re, itertools, time, datetime, math
+import random, os, re, itertools, time, datetime
 import asyncio
 
 from utils import unquote, group_by
-import CardBot, EnchantBot, BlackmarketBot
+import CardBot, EnchantBot, BlackmarketBot,WorldChatBot
 
 class MochiBot(commands.Bot):
 	def __init__(self, token):
@@ -16,6 +16,7 @@ class MochiBot(commands.Bot):
 		# IDs
 		self.my_server        = '220988375946100736'
 		self.my_blackmarket   = '221750533755633675'
+		self.my_worldchat     = '230755425698578433'
 
 		# Log fp
 		self.log_file = open('log.txt', 'a', encoding='utf-8')
@@ -25,6 +26,7 @@ class MochiBot(commands.Bot):
 
 		# Sub-bots
 		self.blackmarket_bot = BlackmarketBot.BlackmarketBot()
+		self.worldchat_bot = WorldChatBot.WorldChatBot()
 		self.enchant_bot = EnchantBot.EnchantBot()
 		self.card_bot = CardBot.CardBot()
 
@@ -88,10 +90,29 @@ class MochiBot(commands.Bot):
 					user = await self.get_user_info(user_id)
 					await self.send_message(user, '\n'.join([item.get_market_message() for item in items]))
 
-			await asyncio.sleep(1)
+			await asyncio.sleep(2)
+
+	async def worldchat_notification_task(self):
+		await self.wait_until_ready()
+		self.log("Worlddchat bot started")
+
+		server = self.get_server(self.my_server)
+		channel = server.get_channel(self.my_worldchat)
+		while True:
+			new_msg = self.worldchat_bot.fetch_new_message()
+			self.log("{0} new messages fetched from worldchat".format(len(new_msg)))
+			for msgs in group_by(new_msg, members=5):
+				while True:
+					try:
+						await self.send_message(channel, '\n'.join([msg.get_worldchat_message() for msg in msgs]))
+						break
+					except:
+						continue
+			await asyncio.sleep(5)
 
 	def start_mochi_bot(self):
 		self.loop.create_task(self.blackmarket_notification_task())
+		self.loop.create_task(self.worldchat_notification_task())
 		self.run(self.token)
 
 	###########################
