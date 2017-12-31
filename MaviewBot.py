@@ -27,6 +27,13 @@ class MaviewBot:
 			print ("Failed to fetch new items")
 			return []
 
+		prev_last_updated = self.last_updated
+
 		if len(res_json) > 0:
 			self.last_updated = int(res_json[-1]['time'])
+
+		if prev_last_updated == 0:
+			print ("Initial fetch success")
+			return []
+
 		return res_json
